@@ -740,7 +740,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			const bit = s.bitrate || 'N/A';
 			if (s.url) out += ` stream_data[${i}]: "${s.url}|${name}|${genre}|${lang}|${bit}|0"\n`;
 		});
-		out += `\n stream_count: ${stationsToUse.length}\n}\n\n}`;
+		out += `\n}\n\n}`;
 		try {
 			downloadFile(out, "live_streams.sii", "text/plain;charset=utf-8");
 		} catch (e) {
