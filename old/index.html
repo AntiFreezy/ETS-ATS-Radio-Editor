@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>ETS 2 Radio</title>
+	<script src="merge.js"></script>
+	<link rel="stylesheet" href="merge.css" />
+</head>
+<body>
+	<canvas id="pixie"></canvas>
+	<div id="info">
+		<p>Download the file and put the file into the folder: "<b>Documents\Euro Truck Simulator 2</b>".</p>
+	</div>
+	<div id="selector">
+		<a href="#" id="load" class="button">Load my list</a>
+		<a href="#" id="edit" class="button">Edit list</a>
+		<a href="#" id="download" class="button">Download</a>
+	</div>
+	<audio id="radio" src="" hidden></audio>
+	<input id="load-file" type="file" accept=".sii" style="display:none;">
+	<div id="translate">
+		<img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDkgNiIgd2lkdGg9IjkwMCIgaGVpZ2h0PSI2MDAiPjxyZWN0IGZpbGw9IiNmZmYiIHdpZHRoPSI5IiBoZWlnaHQ9IjMiLz48cmVjdCBmaWxsPSIjZDUyYjFlIiB5PSIzIiB3aWR0aD0iOSIgaGVpZ2h0PSIzIi8+PHJlY3QgZmlsbD0iIzAwMzlhNiIgeT0iMiIgd2lkdGg9IjkiIGhlaWdodD0iMiIvPjwvc3ZnPg==" alt="ru">
+		<img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHdpZHRoPSIxMjM1IiBoZWlnaHQ9IjY1MCIgdmlld0JveD0iMCAwIDc0MTAgMzkwMCI+PHJlY3Qgd2lkdGg9Ijc0MTAiIGhlaWdodD0iMzkwMCIgZmlsbD0iI2IyMjIzNCIvPjxwYXRoIGQ9Ik0wLDQ1MEg3NDEwbTAsNjAwSDBtMCw2MDBINzQxMG0wLDYwMEgwbTAsNjAwSDc0MTBtMCw2MDBIMCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjMwMCIvPjxyZWN0IHdpZHRoPSIyOTY0IiBoZWlnaHQ9IjIxMDAiIGZpbGw9IiMzYzNiNmUiLz48ZyBmaWxsPSIjZmZmIj48ZyBpZD0iczE4Ij48ZyBpZD0iczkiPjxnIGlkPSJzNSI+PGcgaWQ9InM0Ij48cGF0aCBpZD0icyIgZD0iTTI0Nyw5MCAzMTcuNTM0MjMwLDMwNy4wODIwMzkgMTMyLjg3MzIxOCwxNzIuOTE3OTYxSDM2MS4xMjY3ODJMMTc2LjQ2NTc3MCwzMDcuMDgyMDM5eiIvPjx1c2UgeGxpbms6aHJlZj0iI3MiIHk9IjQyMCIvPjx1c2UgeGxpbms6aHJlZj0iI3MiIHk9Ijg0MCIvPjx1c2UgeGxpbms6aHJlZj0iI3MiIHk9IjEyNjAiLz48L2c+PHVzZSB4bGluazpocmVmPSIjcyIgeT0iMTY4MCIvPjwvZz48dXNlIHhsaW5rOmhyZWY9IiNzNCIgeD0iMjQ3IiB5PSIyMTAiLz48L2c+PHVzZSB4bGluazpocmVmPSIjczkiIHg9IjQ5NCIvPjwvZz48dXNlIHhsaW5rOmhyZWY9IiNzMTgiIHg9Ijk4OCIvPjx1c2UgeGxpbms6aHJlZj0iI3M5IiB4PSIxOTc2Ii8+PHVzZSB4bGluazpocmVmPSIjczUiIHg9IjI0NzAiLz48L2c+PC9zdmc+" alt="en">
+	</div>
+	<script>
+
+		var langList = {
+			ru: {
+				info: '<p>Простой редактор радио. Загрузите файл, отредактируйте, скачайте...</p>',
+				loading: "Загрузка стран...",
+				edit: "Редактировать",
+				editing: "Редактирование списка",
+				download: "Скачать",
+				select: "Загрузите файл...",
+				check: "Выбрать всё",
+				uncheck: "Отменить всё",
+				stop: "Выкл.",
+				play: "Восп.",
+				name: "Название",
+				city: "Город",
+				gender: "Жанр",
+				region: "Страна",
+				bitrate: "Битрейт",
+				load: "Загрузить файл",
+				remove: "Удалить",
+				addRadio: "Добавить радио",
+				add: "Добавить",
+				cancel: "Отменить",
+				errAdd: "Ошибка. Поле URL или Название пусто!",
+				url: "URL (Ссылка)"
+			},
+			en:{
+				info: '<p>A simple radio editor. Upload the file, edit, download...',
+				loading: "Country list is loading...",
+				edit: "Edit list",
+				editing: "Editing the list",
+				download: "Download",
+				select: "Upload the file...",
+				check: "Check all",
+				uncheck: "Uncheck all",
+				stop: "Stop",
+				play: "Play",
+				name: "Name",
+				city: "City",
+				gender: "Genre",
+				region: "Country",
+				bitrate: "Bitrate",
+				load: "Upload file",
+				remove: "Remove",
+				addRadio: "Add radio",
+				add: "Add",
+				cancel: "Cancel",
+				errAdd: "Error. Field URL or Name is empty!",
+				url: "URL"
+			}
+		}
+
+		var l_lang;
+		if (navigator.userLanguage) {// Explorer
+			l_lang = navigator.userLanguage;
+		}
+		else if (navigator.language){ // FF
+			l_lang = navigator.language;
+		}
+		else{
+			l_lang = "en";
+		}
+
+		var lang = l_lang.slice(0,2) === "ru" ? langList.ru : langList.en;
+
+		$.fn.bootstrapTable.locales["ru-RU"] = {
+	        formatLoadingMessage: function() {
+	            return "Пожалуйста, подождите, идёт загрузка..."
+	        },
+	        formatRecordsPerPage: function(a) {
+	            return a + " записей на страницу"
+	        },
+	        formatShowingRows: function(a, b, c) {
+	            return "Записи с " + a + " по " + b + " из " + c
+	        },
+	        formatSearch: function() {
+	            return "Поиск"
+	        },
+	        formatNoMatches: function() {
+	            return "Ничего не найдено"
+	        },
+	        formatRefresh: function() {
+	            return "Обновить"
+	        },
+	        formatToggle: function() {
+	            return "Переключить"
+	        },
+	        formatColumns: function() {
+	            return "Колонки"
+	        },
+	        formatClearFilters: function() {
+	            return "Очистить фильтры"
+	        }
+	    };
+
+		function translate(language){
+			$.extend($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales[language == "ru" ? "ru-RU" : "en-US"]);
+			lang = language === "ru" ? langList.ru : langList.en;
+			$("#info p").html(lang.info);
+			$("#edit").text(lang.edit);
+			$("#download").text(lang.download);
+			$("#load").text(lang.load);
+		}
+
+		$("#translate img").on("click", function(evt){
+			translate($(this).attr("alt"));
+		});
+
+		translate(l_lang.slice(0,2));
+
+		var selections = [],
+		loadedList = [],
+		_ = setOps,
+		playButton = '<button onclick="playRadio(this.attributes.data.value, this)" data="URL_HERE" type="button" class="btn btn-info btn-xs">'+
+							'&nbsp;<span class="glyphicon glyphicon-play" aria-hidden="true"></span>&nbsp;'+
+						'</button>';
+
+		$("#load").on("click", function(){
+			$("#load-file").trigger('click');
+		});
+
+		$("#load-file").on("change", function(evt)
+		{
+			var fils = evt.target.files[0];
+			var reader = new FileReader();
+			reader.readAsText(fils);
+			reader.onload = function(e){
+				loadedList = e.target.result
+				.match(/\"(.+)\"/g)
+				.map(function(str, id){
+					var args = str.slice(1,-1).split("|");
+					return {
+						id: id,
+						url: args[0],
+						play: playButton.replace("URL_HERE", args[0]),
+						name: args[1],
+						gender: args[2] || "-",
+						region: args[3] || "-",
+						bitrate: args[4] || "-",
+					};
+				});
+				selections = [];
+			};
+		});
+
+		$("#download").on("click", function(){
+			var country = $("#countries").val(),
+			radioList = [],
+			output;
+			
+			if(loadedList.length === 0) {
+				return alert(lang.select);
+			}
+
+			if(selections.length > 0){
+				radioList = selections.map(function(id){return loadedList[id];});
+				output = "SiiNunit\n{\nlive_stream_def : .live_streams {\n";
+				radioList.forEach(function(r,i){
+					output += ' stream_data[' + i + ']: "' + r.url + '|' + r.name.replace(/"/g,"'") + '|' + r.gender + '|' + r.region + '|' + r.bitrate + '"\r\n';
+				});
+				output += "}\n}";
+				download(output, "live_streams.sii", "text/plain");
+				return;
+			}
+			output = "SiiNunit\n{\nlive_stream_def : .live_streams {\n";
+			loadedList.forEach(function(r,i){
+				output += ' stream_data[' + i + ']: "' + r.url + '|' + r.name.replace(/"/g,"'") + '|' + r.gender + '|' + r.region + '|' + r.bitrate + '"\r\n';
+			});
+			output += "}\n}";
+			download(output, "live_streams.sii", "text/plain");
+		});
+
+		$("#edit").on("click", function(){
+			if(loadedList.length === 0) {
+				//return alert(lang.select);
+			}
+
+			function delRow(value, row, index) {
+				return [
+					'<a class="remove" href="javascript:void(0)" title="'+ lang.remove +'">',
+					'<i class="glyphicon glyphicon-remove"></i>',
+					'</a>'
+				].join('').replace(/"/g, "'");
+			}
+
+			var dialog = bootbox.dialog({
+				title: lang.editing,
+				message: '<div id="toolbar">'+
+							'<div class="form-inline" role="form">'+
+								'<button id="cAll" type="submit" class="btn btn-default">'+lang.check+'</button>&nbsp;&nbsp;'+
+								'<button id="uncAll" type="submit" class="btn btn-default">'+lang.uncheck+'</button>&nbsp;&nbsp;'+
+								'<button id="stopSound" type="submit" class="btn btn-default">'+lang.stop+'</button>&nbsp;&nbsp;'+
+								'<button id="addRadio" type="submit" class="btn btn-default">'+lang.addRadio+'</button>&nbsp;&nbsp;'+
+							'</div>'+
+						'</div>'+
+						'<table id="table"'+
+							   'data-toggle="table"'+
+							   'data-pagination="true"'+
+							   'data-search="true"'+
+							   'data-toolbar="#toolbar">'+
+							'<thead>'+
+							'<tr>'+
+								'<th data-field="state" data-checkbox="true"></th>'+
+								'<th data-field="play" class="playRow">'+lang.play+'</th>'+
+								'<th data-field="name" data-editable="true">'+lang.name+'</th>'+
+								'<th data-field="gender" data-width="150px">'+lang.gender+'</th>'+
+								'<th data-field="region" data-width="75px">'+lang.region+'</th>'+
+								'<th data-field="bitrate" data-width="80px">'+lang.bitrate+'</th>'+
+								'<th id="format" data-width="34px"><i class="glyphicon glyphicon-remove"></i></th>'+
+							'</tr>'+
+							'</thead>'+
+						'</table>',
+				size: 'large'
+			});
+
+			var $table = $('#table');
+			$("#format").data("formatter", delRow)
+			$("#format").data("events", {"click .remove": dRow});
+			$('#table').bootstrapTable({
+				onPreBody: function (rows) {
+					renderHandler(rows);
+				},
+				onPageChange: function(){
+					var radioEl = $("#radio")[0];
+					if(!radioEl.paused){
+						$('button[data=' + CSS.escape(radioEl.currentSrc) + ']').find('span').removeClass("glyphicon-play").addClass("glyphicon-stop");
+					}
+				}
+			});
+			$table.on('check.bs.table check-all.bs.table ' +
+					'uncheck.bs.table uncheck-all.bs.table', function (e, rows) {
+				var ids;
+				if($.inArray(e.type, ['check', 'uncheck']) > -1){
+					ids = $.map(!$.isArray(rows) ? [rows] : rows, function (row) {
+						return row.id;
+					});
+				}
+				else{
+					var opt = $table.bootstrapTable('getOptions');
+					if(opt.searchText.length > 0){
+						ids = $table.bootstrapTable('getData').slice(opt.pageSize * (opt.pageNumber - 1), opt.pageNumber*opt.pageSize).map(function(row){return row.id})
+					}
+					else{
+						ids = $('tr[data-index]').map(function(key, el){
+							return $(el).data('index');
+						});
+						ids = Array.apply({}, ids);
+					}
+				}
+				var func = $.inArray(e.type, ['check', 'check-all']) > -1 ? 'union' : 'difference';
+				selections = _[func](selections, ids);
+			});
+
+			function dRow (e, value, row, index) {
+	            $table.bootstrapTable('remove', {
+	                field: 'id',
+	                values: [row.id]
+	            });
+	            loadedList.forEach(function(el, id){
+	            	el.id = id;
+	            });
+	        }
+
+			$table.bootstrapTable('load', loadedList);
+
+			$table.bootstrapTable("getOptions").onPageChange();
+
+			$("#cAll").on('click', function(){
+				$table.bootstrapTable('checkAll');
+				selections = $table.bootstrapTable('getData').map(function(row){return row.id});
+			});
+			$("#uncAll").on('click', function(){
+				$table.bootstrapTable('uncheckAll');
+				selections = [];
+			});
+			$("#stopSound").on('click', function(){
+				$("#radio")[0].pause();
+				$('.glyphicon-stop').removeClass("glyphicon-stop").addClass("glyphicon-play");
+			});
+
+			$("#addRadio").on('click', function(){
+				var form  = $('<form>'+
+								'<input name="rUrl" class="form-control m-bot" placeholder="' + lang.url + '"/>'+
+								'<input name="rName" class="form-control m-bot" placeholder="' + lang.name + '"/>'+
+								'<input name="rGenre" class="form-control m-bot" placeholder="' + lang.gender + '"/>'+
+								'<input name="rRegion" class="form-control m-bot" placeholder="' + lang.region + '"/>'+
+								'<input name="rBitrate" class="form-control" placeholder="' + lang.bitrate + '"/>'+
+							'</form>');
+				bootbox.confirm({
+					title: lang.addRadio,
+				    message: form,
+				    buttons: {
+				        confirm: {
+				            label: lang.add,
+				            className: 'btn-success'
+				        },
+				        cancel: {
+				            label: lang.cancel,
+				            className: 'btn-danger'
+				        }
+				    },
+				    callback: function (result) {
+				        if(result){
+							var rUrl = form.find('input[name=rUrl]').val(),
+								rName = form.find('input[name=rName]').val(), 
+								rGenre = form.find('input[name=rGenre]').val(),
+								rRegion = form.find('input[name=rRegion]').val(),
+								rBitrate = form.find('input[name=rBitrate]').val();
+							if(rUrl.length == 0 || rName.length == 0){
+								bootbox.alert(lang.errAdd);
+								return;
+							}
+							var obj = {
+								id: loadedList.length,
+								url: rUrl,
+								play: playButton.replace("URL_HERE", rUrl),
+								name: rName,
+								gender: rGenre || "-",
+								region: rRegion || "-",
+								bitrate: rBitrate || "-",
+							}
+							$table.bootstrapTable('append', obj);
+							loadedList.push(obj);						}
+				    }
+				});
+			});
+		});
+
+		function download(data, filename, type) {
+			var file = new Blob([data], {type: type});
+			if (window.navigator.msSaveOrOpenBlob) // IE10+
+				window.navigator.msSaveOrOpenBlob(file, filename);
+			else { // Others
+				var a = document.createElement("a"),
+						url = URL.createObjectURL(file);
+				a.href = url;
+				a.download = filename;
+				document.body.appendChild(a);
+				a.click();
+				setTimeout(function() {
+					document.body.removeChild(a);
+					window.URL.revokeObjectURL(url);  
+				}, 0); 
+			}
+		}
+
+		function renderHandler(rows) {
+			$.each(rows, function (i, row) {
+				row.state = $.inArray(row.id, selections) !== -1;
+			});
+			return rows;
+		}
+
+		function playRadio(url, el){
+			var spanIcon = $(el).find('span');
+			if(spanIcon.hasClass("glyphicon-stop")){
+				$("#radio")[0].pause();
+				spanIcon.removeClass("glyphicon-stop").addClass("glyphicon-play");
+				return;
+			}
+			$('.glyphicon-stop').removeClass("glyphicon-stop").addClass("glyphicon-play");
+			spanIcon.removeClass("glyphicon-play").addClass("glyphicon-stop");
+			var radio = $("#radio")[0];
+			radio.pause();
+			radio.src = url;
+			radio.load();
+			radio.play();
+		}
+
+		function draw() { con.clearRect(0, 0, WIDTH, HEIGHT); for (var e = 0; e < pxs.length; e++) { pxs[e].fade(); pxs[e].move(); pxs[e].draw() } } function Circle() { WIDTH = window.innerWidth; HEIGHT = window.innerHeight; this.s = { ttl: 8e3, xmax: 5, ymax: 2, rmax: 10, rt: 1, xdef: 960, ydef: 540, xdrift: 4, ydrift: 4, random: true, blink: true }; this.reset = function () { this.x = this.s.random ? WIDTH * Math.random() : this.s.xdef; this.y = this.s.random ? HEIGHT * Math.random() : this.s.ydef; this.r = (this.s.rmax - 1) * Math.random() + 1; this.dx = Math.random() * this.s.xmax * (Math.random() < .5 ? -1 : 1); this.dy = Math.random() * this.s.ymax * (Math.random() < .5 ? -1 : 1); this.hl = this.s.ttl / rint * (this.r / this.s.rmax); this.rt = Math.random() * this.hl; this.s.rt = Math.random() + 1; this.stop = Math.random() * .2 + .4; this.s.xdrift *= Math.random() * (Math.random() < .5 ? -1 : 1); this.s.ydrift *= Math.random() * (Math.random() < .5 ? -1 : 1) }; this.fade = function () { this.rt += this.s.rt }; this.draw = function () { if (this.s.blink && (this.rt <= 0 || this.rt >= this.hl)) this.s.rt = this.s.rt * -1; else if (this.rt >= this.hl) this.reset(); var e = 1 - this.rt / this.hl; con.beginPath(); con.arc(this.x, this.y, this.r, 0, Math.PI * 2, true); con.closePath(); var t = this.r * e; g = con.createRadialGradient(this.x, this.y, 0, this.x, this.y, t <= 0 ? 1 : t); g.addColorStop(0, "rgba(255,255,255," + e + ")"); g.addColorStop(this.stop, "rgba(77,101,181," + e * .6 + ")"); g.addColorStop(1, "rgba(77,101,181,0)"); con.fillStyle = g; con.fill() }; this.move = function () { WIDTH = window.innerWidth; HEIGHT = window.innerHeight; this.x += this.rt / this.hl * this.dx; this.y += this.rt / this.hl * this.dy; if (this.x > WIDTH || this.x < 0) this.dx *= -1; if (this.y > HEIGHT || this.y < 0) this.dy *= -1 }; this.getX = function () { return this.x }; this.getY = function () { return this.y } } var WIDTH; var HEIGHT; var canvas; var con; var g; var pxs = new Array; var rint = 60; $(document).ready(function () { WIDTH = "100%"; HEIGHT = "100%"; $("#container").width(WIDTH).height(HEIGHT); WIDTH = window.innerWidth; HEIGHT = window.innerHeight; canvas = document.getElementById("pixie"); $(canvas).attr("width", WIDTH).attr("height", HEIGHT); con = canvas.getContext("2d"); for (var e = 0; e < 100; e++) { pxs[e] = new Circle; pxs[e].reset() } setInterval(draw, rint) });$(window).resize(function() {WIDTH = window.innerWidth; HEIGHT = window.innerHeight; canvas = document.getElementById("pixie"); $(canvas).attr("width", WIDTH).attr("height", HEIGHT);}); $(".services .header2 .service-header").hover(function () { var e = $(this); e.find("h3").hide(); $(this).parent().find(".header-bg").stop(true, true).animate({ width: "100%" }, "fast", function () { e.find("h3").addClass("active").fadeIn("fast") }) }, function () { var e = $(this); e.find("h3").hide(); e.parent().find(".header-bg").stop(true, true).animate({ width: 70 }, "fast", function () { e.find("h3").removeClass("active").fadeIn("fast") }) })
+	</script>
+</body>
+</html>

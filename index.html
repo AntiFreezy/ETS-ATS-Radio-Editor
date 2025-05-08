@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+   <head>
+	  <meta charset="UTF-8">
+	  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	  <title>ETS 2 / ATS Radio Editor</title>
+	  <!-- Bootstrap 5 CSS -->
+	  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+	  <!-- Bootstrap Icons -->
+	  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+	  <!-- Custom CSS -->
+	  <link rel="stylesheet" href="style.css">
+	  <!-- Favicon -->
+	  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>">
+   </head>
+   <body>
+	  <!-- Animated Background -->
+	  <canvas id="pixie"></canvas>
+	  <!-- Loading Overlay -->
+	  <div id="loading-overlay" class="d-none justify-content-center align-items-center">
+		 <!-- Initially hidden -->
+		 <div class="spinner-border text-light" role="status"><span class="visually-hidden">Загрузка...</span></div>
+		 <span id="loading-text" class="ms-3 text-light">Обработка файла...</span>
+	  </div>
+	  <!-- Main Content Container -->
+	  <div class="container main-container py-4">
+		 <!-- Header & Info -->
+		 <div class="text-center mb-4">
+			<h1 class="text-light">ETS/ATS Radio Editor</h1>
+			<div id="info-block" class="alert alert-info d-inline-block" role="alert">
+			   <p class="mb-1" data-translate-html="info">Загрузите ваш файл <code>live_streams.sii</code>, отредактируйте список и скачайте обновленный файл.</p>
+			   <p class="mb-0 small" data-translate-html="editHint"><i class="bi bi-info-circle me-1"></i>Для редактирования поля (Название, Жанр и т.д.) дважды кликните по нему. URL редактируется по кнопке <i class="bi bi-link-45deg"></i>.</p>
+			</div>
+		 </div>
+		 <!-- Main Controls -->
+		 <div id="main-controls" class="d-flex flex-wrap justify-content-center align-items-center gap-2 mb-4 p-3 rounded bg-dark bg-opacity-50 shadow-sm">
+			<button id="load-button" class="btn btn-success"><i class="bi bi-upload me-2"></i><span data-translate="load">Загрузить .sii</span></button>
+			<input id="load-file-input" type="file" accept=".sii" style="display:none;">
+			<button id="add-station-button" class="btn btn-info" disabled><i class="bi bi-plus-circle me-2"></i><span data-translate="addRadio">Добавить станцию</span></button>
+			<button id="download-button" class="btn btn-primary" disabled><i class="bi bi-download me-2"></i><span data-translate="download">Скачать .sii</span></button>
+			<!-- Новые кнопки-ссылки -->
+            <a href="ETS-ATS-Radio-Editor/old" target="_blank" class="btn btn-sm btn-outline-primary ms-lg-auto"> <!-- ms-lg-auto прижмет их и язык вправо на больших экранах -->
+                <i class="bi bi-arrow-left-square me-1"></i><span data-translate="linkOldVersion">Старая версия</span>
+            </a>
+             <a href="https://antifreezy.github.io/ETS-ATS-Radio/" target="_blank" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-broadcast me-1"></i><span data-translate="linkRadioHelper">Помощник Радио</span>
+            </a>
+			<div id="translate" class="ms-lg-auto mt-2 mt-lg-0">
+			   <!-- ms-lg-auto для больших экранов -->
+			   <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDkgNiIgd2lkdGg9IjkwMCIgaGVpZ2h0PSI2MDAiPjxyZWN0IGZpbGw9IiNmZmYiIHdpZHRoPSI5IiBoZWlnaHQ9IjMiLz48cmVjdCBmaWxsPSIjZDUyYjFlIiB5PSIzIiB3aWR0aD0iOSIgaGVpZ2h0PSIzIi8+PHJlY3QgZmlsbD0iIzAwMzlhNiIgeT0iMiIgd2lkdGg9IjkiIGhlaWdodD0iMiIvPjwvc3ZnPg==" alt="ru" data-lang="ru" title="Русский">
+			   <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHdpZHRoPSIxMjM1IiBoZWlnaHQ9IjY1MCIgdmlld0JveD0iMCAwIDc0MTAgMzkwMCI+PHJlY3Qgd2lkdGg9Ijc0MTAiIGhlaWdodD0iMzkwMCIgZmlsbD0iI2IyMjIzNCIvPjxwYXRoIGQ9Ik0wLDQ1MEg3NDEwbTAsNjAwSDBtMCw2MDBINzQxMG0wLDYwMEgwbTAsNjAwSDc0MTBtMCw2MDBIMCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjMwMCIvPjxyZWN0IHdpZHRoPSIyOTY0IiBoZWlnaHQ9IjIxMDAiIGZpbGw9IiMzYzNiNmUiLz48ZyBmaWxsPSIjZmZmIj48ZyBpZD0iczE4Ij48ZyBpZD0iczkiPjxnIGlkPSJzNSI+PGcgaWQ9InM0Ij48cGF0aCBpZD0icyIgZD0iTTI0Nyw5MCAzMTcuNTM0MjMwLDMwNy4wODIwMzkgMTMyLjg3MzIxOCwxNzIuOTE3OTYxSDM2MS4xMjY3ODJMMTc2LjQ2NTc3MCwzMDcuMDgyMDM5eiIvPjx1c2UgeGxpbms6aHJlZj0iI3MiIHk9IjQyMCIvPjx1c2UgeGxpbms6aHJlZj0iI3MiIHk9Ijg0MCIvPjx1c2UgeGxpbms6aHJlZj0iI3MiIHk9IjEyNjAiLz48L2c+PHVzZSB4bGluazpocmVmPSIjcyIgeT0iMTY4MCIvPjwvZz48dXNlIHhsaW5rOmhyZWY9IiNzNCIgeD0iMjQ3IiB5PSIyMTAiLz48L2c+PHVzZSB4bGluazpocmVmPSIjczkiIHg9IjQ5NCIvPjwvZz48dXNlIHhsaW5rOmhyZWY9IiNzMTgiIHg9Ijk4OCIvPjx1c2UgeGxpbms6aHJlZj0iI3M5IiB4PSIxOTc2Ii8+PHVzZSB4bGluazpocmVmPSIjczUiIHg9IjI0NzAiLz48L2c+PC9zdmc+" alt="en" data-lang="en" title="English">
+			</div>
+		 </div>
+		 <!-- Table Controls (Появляются после загрузки файла) -->
+		 <div id="table-controls" class="d-none flex-wrap align-items-center gap-2 mb-3 p-2 rounded bg-light bg-opacity-10">
+			<!-- Только громкость и стоп, прижаты вправо -->
+			<div class="ms-auto d-flex align-items-center gap-2">
+			   <label for="volume-control" class="form-label text-light mb-0 text-nowrap" data-translate="volumeLabel">Громкость:</label>
+			   <input type="range" id="volume-control" class="form-range" min="0" max="1" step="0.01" value="0.25" style="width: 100px; min-width: 80px;">
+			   <button id="stop-all-playback" class="btn btn-sm btn-warning flex-shrink-0" title="Остановить воспроизведение" data-translate-title="stopPlayback">⏹️</button>
+			</div>
+		 </div>
+		 <!-- Station Table Area -->
+		 <div id="table-container" class="bg-light bg-opacity-10 rounded p-2 mb-3">
+			<div class="text-center p-5 text-light" data-translate="select">Загрузите файл .sii...</div>
+		 </div>
+		 <!-- Pagination -->
+		 <nav id="pagination-container" aria-label="Stations pagination" class="d-flex justify-content-center"></nav>
+	  </div>
+	  <!-- End Main Container -->
+	  <!-- Toast Container -->
+	  <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100"></div>
+	  <!-- Audio Player -->
+	  <audio id="audio-player" hidden></audio>
+	  <!-- Add Station Modal -->
+	  <div class="modal fade" id="addStationModal" tabindex="-1" aria-labelledby="addStationModalLabel" aria-hidden="true">
+		 <div class="modal-dialog">
+			<div class="modal-content bg-dark text-light">
+			   <div class="modal-header border-secondary">
+				  <h5 class="modal-title" id="addStationModalLabel" data-translate="addRadio">Добавить радиостанцию</h5>
+				  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+			   </div>
+			   <div class="modal-body">
+				  <form id="add-station-form" novalidate>
+					 <div class="mb-3">
+						<label for="station-url" class="form-label"><span data-translate="url">URL (Ссылка)*</span></label>
+						<input type="url" class="form-control form-control-sm bg-dark text-light border-secondary" id="station-url" required placeholder="http:// или https://">
+					 </div>
+					 <div class="mb-3">
+						<label for="station-name" class="form-label"><span data-translate="name">Название*</span></label>
+						<input type="text" class="form-control form-control-sm bg-dark text-light border-secondary" id="station-name" required>
+					 </div>
+					 <div class="mb-3">
+						<label for="station-genre" class="form-label" data-translate="genre">Жанр</label>
+						<input type="text" class="form-control form-control-sm bg-dark text-light border-secondary" id="station-genre">
+					 </div>
+					 <div class="mb-3">
+						<label for="station-language" class="form-label" data-translate="language">Язык</label>
+						<input type="text" class="form-control form-control-sm bg-dark text-light border-secondary" id="station-language" placeholder="Напр.: EN, DE, RU">
+					 </div>
+					 <div class="mb-3">
+						<label for="station-bitrate" class="form-label" data-translate="bitrate">Битрейт (kbit/s)</label>
+						<input type="number" class="form-control form-control-sm bg-dark text-light border-secondary" id="station-bitrate" min="0" placeholder="Напр.: 128, 192, 320">
+					 </div>
+					 <small class="text-muted">* - Обязательные поля</small>
+				  </form>
+			   </div>
+			   <div class="modal-footer border-secondary">
+				  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-translate="cancel">Отмена</button>
+				  <button type="submit" form="add-station-form" class="btn btn-primary" data-translate="add">Добавить</button>
+			   </div>
+			</div>
+		 </div>
+	  </div>
+	  <!-- Edit URL Modal -->
+	  <div class="modal fade" id="editUrlModal" tabindex="-1" aria-labelledby="editUrlModalLabel" aria-hidden="true">
+		 <div class="modal-dialog">
+			<div class="modal-content bg-dark text-light">
+			   <div class="modal-header border-secondary">
+				  <h5 class="modal-title" id="editUrlModalLabel" data-translate="editUrlTitle">Редактировать URL</h5>
+				  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+			   </div>
+			   <div class="modal-body">
+				  <form id="edit-url-form" novalidate>
+					 <p class="mb-2"><span data-translate="stationLabel">Станция:</span> <strong id="edit-url-station-name">Название станции</strong></p>
+					 <div class="mb-3">
+						<label for="edit-station-url" class="form-label"><span data-translate="url">URL (Ссылка)*</span></label>
+						<input type="url" class="form-control form-control-sm bg-dark text-light border-secondary" id="edit-station-url" required placeholder="http:// или https://">
+						<input type="hidden" id="edit-station-id">
+					 </div>
+					 <small class="text-muted">* - Обязательное поле</small>
+				  </form>
+			   </div>
+			   <div class="modal-footer border-secondary">
+				  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-translate="cancel">Отмена</button>
+				  <button type="submit" form="edit-url-form" class="btn btn-primary" data-translate="saveChanges">Сохранить</button>
+			   </div>
+			</div>
+		 </div>
+	  </div>
+	  <!-- Bootstrap 5 JS Bundle -->
+	  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+	  <!-- Particle Animation Script -->
+	  <script>
+		 function draw() { if(!con) return; con.clearRect(0, 0, WIDTH, HEIGHT); for (var e = 0; e < pxs.length; e++) { pxs[e].fade(); pxs[e].move(); pxs[e].draw() } } window.addEventListener('resize', function() { WIDTH = window.innerWidth; HEIGHT = window.innerHeight; canvas = document.getElementById("pixie"); if(canvas) { canvas.width = WIDTH; canvas.height = HEIGHT; } }, false); function Circle() { WIDTH = window.innerWidth; HEIGHT = window.innerHeight; this.s = { ttl: 8e3, xmax: 5, ymax: 2, rmax: 10, rt: 1, xdef: 960, ydef: 540, xdrift: 4, ydrift: 4, random: true, blink: true }; this.reset = function () { this.x = this.s.random ? WIDTH * Math.random() : this.s.xdef; this.y = this.s.random ? HEIGHT * Math.random() : this.s.ydef; this.r = (this.s.rmax - 1) * Math.random() + 1; this.dx = Math.random() * this.s.xmax * (Math.random() < .5 ? -1 : 1); this.dy = Math.random() * this.s.ymax * (Math.random() < .5 ? -1 : 1); this.hl = this.s.ttl / rint * (this.r / this.s.rmax); this.rt = Math.random() * this.hl; this.s.rt = Math.random() + 1; this.stop = Math.random() * .2 + .4; this.s.xdrift *= Math.random() * (Math.random() < .5 ? -1 : 1); this.s.ydrift *= Math.random() * (Math.random() < .5 ? -1 : 1) }; this.fade = function () { this.rt += this.s.rt }; this.draw = function () { if (!con) return; if (this.s.blink && (this.rt <= 0 || this.rt >= this.hl)) this.s.rt = this.s.rt * -1; else if (this.rt >= this.hl) this.reset(); var e = 1 - this.rt / this.hl; con.beginPath(); con.arc(this.x, this.y, this.r, 0, Math.PI * 2, true); con.closePath(); var t = this.r * e; g = con.createRadialGradient(this.x, this.y, 0, this.x, this.y, t <= 0 ? 1 : t); g.addColorStop(0, "rgba(255,255,255," + e + ")"); g.addColorStop(this.stop, "rgba(77,101,181," + e * .6 + ")"); g.addColorStop(1, "rgba(77,101,181,0)"); con.fillStyle = g; con.fill() }; this.move = function () { WIDTH = window.innerWidth; HEIGHT = window.innerHeight; this.x += this.rt / this.hl * this.dx; this.y += this.rt / this.hl * this.dy; if (this.x > WIDTH || this.x < 0) this.dx *= -1; if (this.y > HEIGHT || this.y < 0) this.dy *= -1 }; this.getX = function () { return this.x }; this.getY = function () { return this.y } } var WIDTH; var HEIGHT; var canvas; var con; var g; var pxs = new Array; var rint = 60; var animationInterval; document.addEventListener('DOMContentLoaded', function () { WIDTH = window.innerWidth; HEIGHT = window.innerHeight; canvas = document.getElementById("pixie"); if(canvas) { try { canvas.width = WIDTH; canvas.height = HEIGHT; con = canvas.getContext("2d"); if (!con) throw new Error("Could not get 2D context"); for (var e = 0; e < 100; e++) { pxs[e] = new Circle; pxs[e].reset() } animationInterval = setInterval(draw, rint); } catch (e) { console.error("Canvas animation failed:", e); canvas.style.display = 'none'; } } else { console.warn("Canvas element #pixie not found."); } });
+	  </script>
+	  <!-- Custom App Logic -->
+	  <script src="app.js"></script>
+   </body>
+</html>
