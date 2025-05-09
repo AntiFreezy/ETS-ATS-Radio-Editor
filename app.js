@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	// --- Логика Редактора ---
 
 	function parseSiiContent(content) {
-		const lines = content.match(/stream_data\[\d+\]:\s*\"(.+)\"/g);
+		const lines = content.match(/stream_data\[(\d+)?\]:\s*\"(.+)\"/g);
 		if (!lines) {
 			showToast(translations[currentLanguage].parsingError, 'error');
 			return null;
